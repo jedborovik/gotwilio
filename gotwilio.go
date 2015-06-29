@@ -40,6 +40,21 @@ func NewTwilioClientCustomHTTP(accountSid, authToken string, HTTPClient *http.Cl
 	return &Twilio{accountSid, authToken, twilioUrl, HTTPClient}
 }
 
+func (twilio *Twilio) get(formValues url.Values, twilioUrl string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", twilioUrl, strings.NewReader(formValues.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.SetBasicAuth(twilio.AccountSid, twilio.AuthToken)
+
+	client := twilio.HTTPClient
+	if client == nil {
+		client = http.DefaultClient
+	}
+
+	return client.Do(req)
+}
+
 func (twilio *Twilio) post(formValues url.Values, twilioUrl string) (*http.Response, error) {
 	req, err := http.NewRequest("POST", twilioUrl, strings.NewReader(formValues.Encode()))
 	if err != nil {
